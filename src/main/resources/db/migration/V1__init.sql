@@ -3,7 +3,7 @@
 create table users
 (
     id         bigserial primary key,
-    username    varchar(30) not null,
+    username    varchar(30) not null unique,
     password    varchar(80) not null,
     email       varchar(50) unique,
     firstname   varchar(150),

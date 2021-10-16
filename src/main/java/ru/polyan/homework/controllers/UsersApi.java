@@ -5,9 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.polyan.homework.dto.UserDto;
+import ru.polyan.homework.exceptions.ResourceNotFoundException;
 import ru.polyan.homework.exceptions.ServiceError;
+import ru.polyan.homework.models.User;
 import ru.polyan.homework.services.UserService;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,7 +57,11 @@ public class UsersApi {
             fields.add("email");
             errors = errors.concat("Email is busy; ");
         }
-
+        boolean loginIsFree = usersService.findByUsername(userData.get("username")).isEmpty();
+        if(!loginIsFree){
+            fields.add("username");
+            errors = errors.concat("Login is busy; ");
+        }
         if(!errors.isEmpty()){
             ServiceError srvError = new ServiceError(errors);
             srvError.setFieldsWithError(fields);
@@ -66,5 +74,11 @@ public class UsersApi {
 
     }
 
+    @GetMapping(value = "/userdata")
+    @ResponseBody
+    public UserDto getData(Principal principal) {
+        String userName = principal.getName();
+        return new UserDto(usersService.findByUsername(userName).orElseThrow(()->new ResourceNotFoundException("User with login '" + userName + "' not found!")));
+    }
 
 }
