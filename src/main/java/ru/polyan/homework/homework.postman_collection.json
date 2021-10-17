@@ -1,0 +1,251 @@
+{
+	"info": {
+		"_postman_id": "d12201bb-4d19-4788-ac46-567a1eb7c432",
+		"name": "homework",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "auth",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\":\"user\",\r\n    \"password\":\"100\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8181/hw_pe/api/v1/auth",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8181",
+					"path": [
+						"hw_pe",
+						"api",
+						"v1",
+						"auth"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "register",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "username",
+							"value": "alexa",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "111",
+							"type": "text"
+						},
+						{
+							"key": "email",
+							"value": "alexa@demo.ru",
+							"type": "text"
+						},
+						{
+							"key": "firstname",
+							"value": "Александр",
+							"type": "text"
+						},
+						{
+							"key": "phone",
+							"value": "111-11-11",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8181/hw_pe/api/v1/users/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8181",
+					"path": [
+						"hw_pe",
+						"api",
+						"v1",
+						"users",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get user data",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIiwicm9sZXMiOlsiUk9MRV9VU0VSIl0sImV4cCI6MTYzNDQ4NDY5NiwiaWF0IjoxNjM0NDgxMDk2fQ.0vBWiIKKTHfb9NPrIgC88JM7XH1xg02flo_ewcWmqVk",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8181/hw_pe/api/v1/users/userdata",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8181",
+					"path": [
+						"hw_pe",
+						"api",
+						"v1",
+						"users",
+						"userdata"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get message list",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8181/hw_pe/api/v1/messages/?recordsOnPage=2&page=0",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8181",
+					"path": [
+						"hw_pe",
+						"api",
+						"v1",
+						"messages",
+						""
+					],
+					"query": [
+						{
+							"key": "recordsOnPage",
+							"value": "2"
+						},
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "userId",
+							"value": "1",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "new message",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIiwicm9sZXMiOlsiUk9MRV9VU0VSIl0sImV4cCI6MTYzNDQ4NDY5NiwiaWF0IjoxNjM0NDgxMDk2fQ.0vBWiIKKTHfb9NPrIgC88JM7XH1xg02flo_ewcWmqVk",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "message",
+							"value": "новое сообщение",
+							"type": "text"
+						},
+						{
+							"key": "theme",
+							"value": "новая тема",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8181/hw_pe/api/v1/messages/add",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8181",
+					"path": [
+						"hw_pe",
+						"api",
+						"v1",
+						"messages",
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get message detail",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIiwicm9sZXMiOlsiUk9MRV9VU0VSIl0sImV4cCI6MTYzNDQ4NDY5NiwiaWF0IjoxNjM0NDgxMDk2fQ.0vBWiIKKTHfb9NPrIgC88JM7XH1xg02flo_ewcWmqVk",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "message",
+							"value": "новое сообщение",
+							"type": "text"
+						},
+						{
+							"key": "theme",
+							"value": "новая тема",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8181/hw_pe/api/v1/messages/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8181",
+					"path": [
+						"hw_pe",
+						"api",
+						"v1",
+						"messages",
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
