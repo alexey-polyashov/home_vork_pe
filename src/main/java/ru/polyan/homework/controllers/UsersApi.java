@@ -10,6 +10,7 @@ import ru.polyan.homework.exceptions.ResourceNotFoundException;
 import ru.polyan.homework.exceptions.ServiceError;
 import ru.polyan.homework.models.User;
 import ru.polyan.homework.services.UserService;
+import ru.polyan.homework.utils.Checker;
 
 import java.security.Principal;
 import java.util.ArrayList;
@@ -29,28 +30,17 @@ public class UsersApi {
     @ResponseBody
     public ResponseEntity<?> register(@RequestParam Map<String, String> userData){
 
-        Map<String, String> reqFields = new HashMap<>();
+        Map<String, String> reqFields = new HashMap<>()
+            {{
+                put("username", "Login");
+                put("email", "Email");
+                put("password", "Password");
+                put("firstname", "First name");
+            }};
 
-        reqFields.put("username", "Login");
-        reqFields.put("email", "Email");
-        reqFields.put("password", "Password");
-        reqFields.put("firstname", "First name");
-
-        String errors = "";
-        List<String> fields = new ArrayList<>();
-
-        for(Map.Entry<String, String> reqFld : reqFields.entrySet()){
-            String fldVal = userData.get(reqFld.getKey());
-            if(fldVal==null){
-                fields.add(reqFld.getKey());
-                errors = errors.concat("Expected required field '" + reqFld.getKey() + "'; ");
-                continue;
-            }
-            if(fldVal.isBlank()){
-                fields.add(reqFld.getKey());
-                errors = errors.concat("Required field '" + reqFld.getValue() + "' is empty; ");
-            }
-        }
+        ServiceError srvError = Checker.checkReqFields(reqFields, userData);
+        List<String> fields = srvError.getFieldsWithError();
+        String errors = srvError.getMessage();
 
         boolean emailIsFree = usersService.findByEmail(userData.get("email")).isEmpty();
         if(!emailIsFree){
@@ -63,7 +53,7 @@ public class UsersApi {
             errors = errors.concat("Login is busy; ");
         }
         if(!errors.isEmpty()){
-            ServiceError srvError = new ServiceError(errors);
+            srvError.setMessage(errors);
             srvError.setFieldsWithError(fields);
             return new ResponseEntity(srvError, HttpStatus.BAD_REQUEST);
         }
