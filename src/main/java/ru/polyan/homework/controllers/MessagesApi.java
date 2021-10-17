@@ -31,8 +31,9 @@ public class MessagesApi {
     @GetMapping(value = "/")
     @ResponseBody
     public Page<MessageDto> getMessageList(@RequestParam(required = false, defaultValue = "0") int page,
-                                           @RequestParam(required = false, defaultValue = "5") int recordsOnPage){
-        Page<Message> messageList = messageService.getMessageList(page, recordsOnPage);
+                                           @RequestParam(required = false, defaultValue = "5") int recordsOnPage,
+                                           @RequestParam(required = false, defaultValue = "0") Long userId){
+        Page<Message> messageList = messageService.getMessageList(page, recordsOnPage, userId);
         Page<MessageDto> messageDtoList = messageList.map(p-> new MessageDto(p));
         return messageDtoList;
     }

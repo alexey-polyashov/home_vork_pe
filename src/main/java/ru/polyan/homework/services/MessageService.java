@@ -16,17 +16,23 @@ import ru.polyan.homework.repositories.MessagesRepository;
 public class MessageService {
 
     private final MessagesRepository messagesRepository;
+    private final UserService userService;
 
     public void createMessage(User user, String message, String theme){
         Message newMes = new Message();
-        newMes.setUser_id(user.getId());
+        newMes.setUser(user);
         newMes.setMessage(message);
         newMes.setTheme(theme);
         messagesRepository.save(newMes);
     }
 
-    public Page<Message> getMessageList(int page, int recordsOnPage){
-        return messagesRepository.findAll(PageRequest.of(page, recordsOnPage));
+    public Page<Message> getMessageList(int page, int recordsOnPage, Long userId){
+        if(userId>0){
+            User user = userService.findById(userId).orElseThrow(()->new ResourceNotFoundException("User with id '" + userId + "'"));
+            return messagesRepository.findByUser(user, PageRequest.of(page, recordsOnPage));
+        }else {
+            return messagesRepository.findAll(PageRequest.of(page, recordsOnPage));
+        }
     }
 
     public Message getMessageData(Long messageId){

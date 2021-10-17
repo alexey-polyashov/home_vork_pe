@@ -17,8 +17,9 @@ public class Message {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "user_id")
-    private Long user_id;
+    @ManyToOne(targetEntity = User.class)
+    @JoinColumn(name="user_id")
+    private User user;
 
     @Column(name = "theme")
     private String theme;
