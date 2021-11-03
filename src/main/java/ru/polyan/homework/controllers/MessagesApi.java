@@ -7,17 +7,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.polyan.homework.dto.MessageDto;
+import ru.polyan.homework.dto.NewMessageDto;
 import ru.polyan.homework.exceptions.ResourceNotFoundException;
-import ru.polyan.homework.exceptions.ServiceError;
 import ru.polyan.homework.models.Message;
 import ru.polyan.homework.models.User;
 import ru.polyan.homework.services.MessageService;
 import ru.polyan.homework.services.UserService;
-import ru.polyan.homework.utils.Checker;
 
+import javax.validation.Valid;
 import java.security.Principal;
-import java.util.HashMap;
-import java.util.Map;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -47,24 +46,12 @@ public class MessagesApi {
 
     @PostMapping(value = "/add")
     @ResponseBody
-    public ResponseEntity<?>  addMessage(Principal principal, @RequestParam Map<String, String> messageData){
-
-        Map<String, String> reqFields = new HashMap<>()
-        {{
-            put("theme", "Theme");
-            put("message", "Message");
-        }};
-
-        ServiceError srvError = Checker.checkReqFields(reqFields, messageData);
+    public ResponseEntity<?>  addMessage(Principal principal, @Valid @RequestBody NewMessageDto messageData){
 
         String userName = principal.getName();
         User user = userService.findByUsername(userName).orElseThrow(()->new ResourceNotFoundException("User name '" + userName + "' not found"));
 
-        if(!srvError.getMessage().isBlank()){
-            return new ResponseEntity(srvError, HttpStatus.BAD_REQUEST);
-        }
-
-        messageService.createMessage(user, messageData.get("message"), messageData.get("theme"));
+        messageService.createMessage(user, messageData.getMessage(), messageData.getTheme());
 
         return new ResponseEntity(HttpStatus.OK);
 

@@ -1,6 +1,8 @@
 package ru.polyan.homework.services;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,6 +11,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+import ru.polyan.homework.dto.NewUserDto;
 import ru.polyan.homework.dto.UserDto;
 import ru.polyan.homework.exceptions.ResourceNotFoundException;
 import ru.polyan.homework.models.Role;
@@ -16,6 +20,7 @@ import ru.polyan.homework.models.User;
 import ru.polyan.homework.repositories.UsersRepository;
 
 
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -51,7 +56,24 @@ public class UserService implements UserDetailsService {
         return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
     }
 
-    public void createUser(Map<String, String> userData){
+    public void createUser(@Valid NewUserDto userData){
+
+//        List<String> fields = new ArrayList<>();
+//        String errors = "";
+//
+//        boolean emailIsFree = usersService.findByEmail(userData.getEmail()).isEmpty();
+//        if(!emailIsFree){
+//            fields.add("email");
+//            errors = errors.concat("Email is busy; ");
+//        }
+//        boolean loginIsFree = usersService.findByUsername(userData.getUsername()).isEmpty();
+//        if(!loginIsFree){
+//            fields.add("username");
+//            errors = errors.concat("Login is busy; ");
+//        }
+//        if(!errors.isEmpty()){
+//            return new ResponseEntity(errors, HttpStatus.BAD_REQUEST);
+//        }
 
         User user = new User();
         List<Role> roles = new ArrayList<>();
@@ -59,40 +81,39 @@ public class UserService implements UserDetailsService {
         roles.add(baseRole);
 
         user.setRoles(roles);
-        String fldValue = userData.get("address");
+        String fldValue = userData.getAddress();
         if(fldValue!=null){
             user.setAddress(fldValue);
         }
-        fldValue = userData.get("email");
+        fldValue = userData.getEmail();
         if(fldValue!=null){
             user.setEmail(fldValue);
         }
-        fldValue = userData.get("firstname");
+        fldValue = userData.getFirstname();
         if(fldValue!=null){
             user.setFirstname(fldValue);
         }
-        fldValue = userData.get("lastname");
+        fldValue = userData.getLastname();
         if(fldValue!=null){
             user.setLastname(fldValue);
         }
-        fldValue = userData.get("username");
+        fldValue = userData.getUsername();
         if(fldValue!=null){
             user.setUsername(fldValue);
         }
-        fldValue = userData.get("phone");
+        fldValue = userData.getPhone();
         if(fldValue!=null){
             user.setPhone(fldValue);
         }
-        fldValue = userData.get("password");
+        fldValue = userData.getPassword();
         if(fldValue!=null){
             String pwd = passwordEncoder.encode(fldValue);
             user.setPassword(pwd);
         }
 
-        fldValue = userData.get("birthday");
-        if(fldValue!=null){
-            LocalDate date = LocalDate.parse(fldValue);
-            user.setBirthday(date);
+        LocalDate fldDateValue = userData.getBirthday();
+        if(fldDateValue!=null){
+            user.setBirthday(fldDateValue);
         }
 
         usersRepository.save(user);
