@@ -1,6 +1,7 @@
 package ru.polyan.homework.services;
 
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
@@ -32,6 +33,7 @@ public class UserService implements UserDetailsService {
     private final UsersRepository usersRepository;
     private final RoleService roleService;
     private final PasswordEncoder passwordEncoder;
+    private final ModelMapper modelMapper;
 
     public Optional<User> findByUsername(String username) {
         return usersRepository.findByUsername(username);
@@ -56,67 +58,17 @@ public class UserService implements UserDetailsService {
         return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
     }
 
-    public void createUser(@Valid NewUserDto userData){
+    public void createUser(@Valid User userData){
 
-//        List<String> fields = new ArrayList<>();
-//        String errors = "";
-//
-//        boolean emailIsFree = usersService.findByEmail(userData.getEmail()).isEmpty();
-//        if(!emailIsFree){
-//            fields.add("email");
-//            errors = errors.concat("Email is busy; ");
-//        }
-//        boolean loginIsFree = usersService.findByUsername(userData.getUsername()).isEmpty();
-//        if(!loginIsFree){
-//            fields.add("username");
-//            errors = errors.concat("Login is busy; ");
-//        }
-//        if(!errors.isEmpty()){
-//            return new ResponseEntity(errors, HttpStatus.BAD_REQUEST);
-//        }
-
-        User user = new User();
         List<Role> roles = new ArrayList<>();
         Role baseRole = roleService.findName("ROLE_USER").orElseThrow(() -> new ResourceNotFoundException("Dont found base user role!"));
         roles.add(baseRole);
+        userData.setRoles(roles);
 
-        user.setRoles(roles);
-        String fldValue = userData.getAddress();
-        if(fldValue!=null){
-            user.setAddress(fldValue);
-        }
-        fldValue = userData.getEmail();
-        if(fldValue!=null){
-            user.setEmail(fldValue);
-        }
-        fldValue = userData.getFirstname();
-        if(fldValue!=null){
-            user.setFirstname(fldValue);
-        }
-        fldValue = userData.getLastname();
-        if(fldValue!=null){
-            user.setLastname(fldValue);
-        }
-        fldValue = userData.getUsername();
-        if(fldValue!=null){
-            user.setUsername(fldValue);
-        }
-        fldValue = userData.getPhone();
-        if(fldValue!=null){
-            user.setPhone(fldValue);
-        }
-        fldValue = userData.getPassword();
-        if(fldValue!=null){
-            String pwd = passwordEncoder.encode(fldValue);
-            user.setPassword(pwd);
-        }
+        String pwd = passwordEncoder.encode(userData.getPassword());
+        userData.setPassword(pwd);
 
-        LocalDate fldDateValue = userData.getBirthday();
-        if(fldDateValue!=null){
-            user.setBirthday(fldDateValue);
-        }
-
-        usersRepository.save(user);
+        usersRepository.save(userData);
 
     }
 

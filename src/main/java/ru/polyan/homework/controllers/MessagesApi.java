@@ -2,6 +2,7 @@ package ru.polyan.homework.controllers;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,7 @@ public class MessagesApi {
 
     private final MessageService messageService;
     private final UserService userService;
+    private final ModelMapper modelMapper;
 
     @GetMapping(value = "/")
     @ResponseBody
@@ -41,7 +43,7 @@ public class MessagesApi {
     @ResponseBody
     public MessageDto getMessage(@PathVariable(name="id") Long messageId){
         Message message = messageService.getMessageData(messageId);
-        return new MessageDto(message);
+        return modelMapper.map(message, MessageDto.class);
     }
 
     @PostMapping(value = "/add")
@@ -50,8 +52,9 @@ public class MessagesApi {
 
         String userName = principal.getName();
         User user = userService.findByUsername(userName).orElseThrow(()->new ResourceNotFoundException("User name '" + userName + "' not found"));
-
-        messageService.createMessage(user, messageData.getMessage(), messageData.getTheme());
+        Message message = modelMapper.map(messageData, Message.class);
+        message.setUser(user);
+        messageService.createMessage(message);
 
         return new ResponseEntity(HttpStatus.OK);
 
