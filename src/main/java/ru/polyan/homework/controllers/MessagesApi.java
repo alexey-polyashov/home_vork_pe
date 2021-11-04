@@ -2,22 +2,22 @@ package ru.polyan.homework.controllers;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.polyan.homework.dto.MessageDto;
+import ru.polyan.homework.dto.NewMessageDto;
 import ru.polyan.homework.exceptions.ResourceNotFoundException;
-import ru.polyan.homework.exceptions.ServiceError;
 import ru.polyan.homework.models.Message;
 import ru.polyan.homework.models.User;
 import ru.polyan.homework.services.MessageService;
 import ru.polyan.homework.services.UserService;
-import ru.polyan.homework.utils.Checker;
 
+import javax.validation.Valid;
 import java.security.Principal;
-import java.util.HashMap;
-import java.util.Map;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -27,6 +27,7 @@ public class MessagesApi {
 
     private final MessageService messageService;
     private final UserService userService;
+    private final ModelMapper modelMapper;
 
     @GetMapping(value = "/")
     @ResponseBody
@@ -42,29 +43,18 @@ public class MessagesApi {
     @ResponseBody
     public MessageDto getMessage(@PathVariable(name="id") Long messageId){
         Message message = messageService.getMessageData(messageId);
-        return new MessageDto(message);
+        return modelMapper.map(message, MessageDto.class);
     }
 
     @PostMapping(value = "/add")
     @ResponseBody
-    public ResponseEntity<?>  addMessage(Principal principal, @RequestParam Map<String, String> messageData){
-
-        Map<String, String> reqFields = new HashMap<>()
-        {{
-            put("theme", "Theme");
-            put("message", "Message");
-        }};
-
-        ServiceError srvError = Checker.checkReqFields(reqFields, messageData);
+    public ResponseEntity<?>  addMessage(Principal principal, @Valid @RequestBody NewMessageDto messageData){
 
         String userName = principal.getName();
         User user = userService.findByUsername(userName).orElseThrow(()->new ResourceNotFoundException("User name '" + userName + "' not found"));
-
-        if(!srvError.getMessage().isBlank()){
-            return new ResponseEntity(srvError, HttpStatus.BAD_REQUEST);
-        }
-
-        messageService.createMessage(user, messageData.get("message"), messageData.get("theme"));
+        Message message = modelMapper.map(messageData, Message.class);
+        message.setUser(user);
+        messageService.createMessage(message);
 
         return new ResponseEntity(HttpStatus.OK);
 

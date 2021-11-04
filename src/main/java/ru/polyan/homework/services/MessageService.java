@@ -18,12 +18,8 @@ public class MessageService {
     private final MessagesRepository messagesRepository;
     private final UserService userService;
 
-    public void createMessage(User user, String message, String theme){
-        Message newMes = new Message();
-        newMes.setUser(user);
-        newMes.setMessage(message);
-        newMes.setTheme(theme);
-        messagesRepository.save(newMes);
+    public void createMessage(Message message){
+        messagesRepository.save(message);
     }
 
     public Page<Message> getMessageList(int page, int recordsOnPage, Long userId){
