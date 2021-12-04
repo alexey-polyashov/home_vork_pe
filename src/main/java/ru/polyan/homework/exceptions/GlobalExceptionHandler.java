@@ -37,6 +37,7 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.toList());
         return new ResponseEntity<>(violations, HttpStatus.BAD_REQUEST);
     }
+
     @ExceptionHandler
     public ResponseEntity<?> catchOtherException(Exception e){
         return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
